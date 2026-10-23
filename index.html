@@ -5,16 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My KEF · NEXUS Archive</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root { --g:#00ff87; --c:#60efff; --p:#ff0080; --y:#ffcc00; --bg:#0a0a0f; }
 body { background: #07070a; color: #e5e7eb; font-family: system-ui, -apple-system, sans-serif; }
 .sidebar { background: #0c0c10; border-right: 1px solid #1f2937; }
 .card { background: #111114; border: 1px solid #1f2937; border-radius: 12px; }
-.neon-g { color: #00ff87; text-shadow: 0 0 12px rgba(0,255,135,0.4); }
 .badge { font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 600; letter-spacing: 0.03em; }
 .nav-item { transition: all 0.15s; }
 .nav-item.active { background: #111827; color: #00ff87; border-left: 2px solid #00ff87; }
 .nav-item:hover:not(.active) { background: #111; color: #fff; }
+@media print {
+  .sidebar, header, button, .no-print { display: none !important; }
+  body { background: white; color: black; }
+  #printLabel { display: block !important; }
+}
 </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -42,40 +47,44 @@ body { background: #07070a; color: #e5e7eb; font-family: system-ui, -apple-syste
       <button data-view="simulator" class="nav-item w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-2 text-gray-400"><span class="w-4">◇</span> Flow Simulator</button>
       <div class="text-[10px] text-gray-500 px-3 py-2 tracking-widest mt-4">FIELD OPERATIONS</div>
       <button id="logEventBtn" class="nav-item w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-2 text-gray-400"><span class="w-4">+</span> Log service event</button>
-      <button class="nav-item w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-2 text-gray-400"><span class="w-4">▣</span> Print asset label</button>
+      <button id="printLabelBtn" class="nav-item w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-2 text-gray-400"><span class="w-4">▣</span> Print asset label</button>
     </nav>
     <div class="p-4 m-3 border border-yellow-900/50 bg-yellow-950/20 rounded-lg text-xs">
       <div class="text-yellow-400 font-bold mb-1">SAFETY GATE · REQUIRED</div>
       Do not bypass interlocks or service energized equipment. High-voltage ESP and UV systems require authorized personnel following the exact OEM procedure.
     </div>
   </aside>
+
   <main class="flex-1 flex flex-col overflow-hidden">
-    <header class="border-b border-gray-800 px-6 py-3 flex items-center justify-between bg-black/40">
+    <header class="border-b border-gray-800 px-6 py-3 flex items-center justify-between bg-black/40 no-print">
       <div class="text-sm text-gray-400">NEXUS / <span id="viewLabel" class="text-white">OVERVIEW</span></div>
       <div class="flex items-center gap-3">
-        <span class="text-xs flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> LOCAL DEMO DATA</span>
-        <button class="text-xs border border-gray-700 px-3 py-1.5 rounded-lg hover:border-gray-500">EXPORT JSON →</button>
+        <span class="text-xs flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> LOCAL STORAGE</span>
+        <button id="exportBtn" class="text-xs border border-gray-700 px-3 py-1.5 rounded-lg hover:border-gray-500">EXPORT JSON →</button>
       </div>
     </header>
+
     <div id="content" class="flex-1 overflow-y-auto p-6">
       <div id="view-overview">
         <div class="text-xs text-green-400 tracking-widest mb-2">ASSET INTELLIGENCE · FIELD SERVICE · TRACEABLE EVIDENCE</div>
         <h1 class="text-4xl font-bold mb-1">Every unit has a history.</h1>
         <h2 class="text-4xl font-bold text-[#00ff87] mb-4">Make it usable.</h2>
-        <p class="text-gray-400 max-w-2xl mb-6">A mobile-first equipment passport for commercial kitchen exhaust fans (KEF) and pollution control units (PCU). Connect observed conditions, source-backed diagnostics, service actions, and verification without confusing one for another.</p>
+        <p class="text-gray-400 max-w-2xl mb-6">Equipment passport for commercial kitchen exhaust fans (KEF) and pollution control units (PCU). Log observed conditions, service actions, and verification.</p>
         <div class="flex gap-3 mb-8">
           <button id="quickLog" class="bg-[#00ff87] text-black font-bold px-5 py-2.5 rounded-lg text-sm">+ LOG SERVICE EVENT</button>
-          <button class="border border-gray-700 px-5 py-2.5 rounded-lg text-sm">OPEN ASSET PASSPORT →</button>
+          <button id="openPassport" class="border border-gray-700 px-5 py-2.5 rounded-lg text-sm">OPEN ASSET PASSPORT →</button>
         </div>
+
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="card p-5"><div class="text-xs text-gray-500 mb-1">REGISTERED ASSETS</div><div class="text-4xl font-bold text-[#00ff87]">04</div><div class="text-xs text-gray-500 mt-1">Demo assets · local to this browser</div></div>
-          <div class="card p-5"><div class="text-xs text-gray-500 mb-1">OPEN FINDINGS</div><div class="text-4xl font-bold text-[#ffcc00]">03</div><div class="text-xs text-gray-500 mt-1">Items require review or verification</div></div>
-          <div class="card p-5"><div class="text-xs text-gray-500 mb-1">VERIFIED EVENTS</div><div class="text-4xl font-bold text-[#00ff87]">03</div><div class="text-xs text-gray-500 mt-1">Demo history records</div></div>
-          <div class="card p-5"><div class="text-xs text-gray-500 mb-1">UNRESOLVED / ESCALATED</div><div class="text-4xl font-bold text-[#ff0080]">01</div><div class="text-xs text-gray-500 mt-1">Do not treat as cleared</div></div>
+          <div class="card p-5"><div class="text-xs text-gray-500 mb-1">REGISTERED ASSETS</div><div class="text-4xl font-bold text-[#00ff87]" id="assetCount">1</div><div class="text-xs text-gray-500 mt-1">Local to this browser</div></div>
+          <div class="card p-5"><div class="text-xs text-gray-500 mb-1">OPEN FINDINGS</div><div class="text-4xl font-bold text-[#ffcc00]" id="findingCount">0</div><div class="text-xs text-gray-500 mt-1">Items require review</div></div>
+          <div class="card p-5"><div class="text-xs text-gray-500 mb-1">EVENTS LOGGED</div><div class="text-4xl font-bold text-[#00ff87]" id="eventCount">0</div><div class="text-xs text-gray-500 mt-1">From this device</div></div>
+          <div class="card p-5"><div class="text-xs text-gray-500 mb-1">UNRESOLVED</div><div class="text-4xl font-bold text-[#ff0080]" id="unresolvedCount">0</div><div class="text-xs text-gray-500 mt-1">Do not treat as cleared</div></div>
         </div>
+
         <div class="card p-5 mb-6">
           <div class="flex justify-between items-center mb-4">
-            <div><div class="font-semibold">Featured asset passport</div><div class="text-xs text-gray-500">PRIMARY DEMO ASSET / KITCHEN EXHAUST LINE A</div></div>
+            <div><div class="font-semibold">Featured asset passport</div><div class="text-xs text-gray-500">KITCHEN EXHAUST LINE A</div></div>
             <span class="badge bg-green-900/50 text-green-400 border border-green-800">REGISTERED</span>
           </div>
           <div class="flex gap-4">
@@ -85,90 +94,225 @@ body { background: #07070a; color: #e5e7eb; font-family: system-ui, -apple-syste
             <div class="flex-1">
               <div class="flex gap-2 mb-1">
                 <span class="badge bg-gray-800 text-gray-300">KEF + PCU</span>
-                <span class="badge bg-yellow-900/40 text-yellow-400">1 OPEN FINDING</span>
+                <span class="badge bg-yellow-900/40 text-yellow-400" id="openFindingBadge">0 OPEN FINDINGS</span>
               </div>
               <h3 class="text-xl font-bold">Kitchen Exhaust Line A</h3>
-              <div class="text-sm text-gray-400">Example restaurant · Austin, TX · Asset ID KEF-ATX-001</div>
+              <div class="text-sm text-gray-400">Austin, TX · Asset ID KEF-ATX-001</div>
               <div class="flex gap-2 mt-2 text-xs">
                 <span class="badge bg-green-900/30 text-green-400">Asset record present</span>
-                <span class="badge bg-gray-800 text-gray-400">Last visit: Oct 18, 2026</span>
+                <span class="badge bg-gray-800 text-gray-400" id="lastVisit">Last visit: none</span>
               </div>
-              <p class="text-sm text-gray-500 mt-3">Demo metadata only. OEM make/model and nameplate details should be confirmed against the installed equipment before applying a diagnostic procedure.</p>
               <div class="grid grid-cols-3 gap-3 mt-4 text-xs">
-                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">OEM / MAKE</div><div>CaptiveAire · example</div></div>
-                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">MODEL</div><div>PCU-series · verify nameplate</div></div>
-                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">IDENTIFIER</div><div>DEMO-ATX-001</div></div>
+                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">OEM / MAKE</div><div>CaptiveAire</div></div>
+                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">MODEL</div><div>PCU-series</div></div>
+                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">IDENTIFIER</div><div>KEF-ATX-001</div></div>
                 <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">CONFIGURATION</div><div>ESP + mechanical stages</div></div>
-                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">CONTROL STATUS</div><div>Unknown · not interrogated</div></div>
-                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">LAST VERIFIED</div><div>Not yet confirmed</div></div>
+                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">CONTROL STATUS</div><div>Not interrogated</div></div>
+                <div class="border border-gray-800 rounded p-2"><div class="text-gray-500">LAST VERIFIED</div><div id="lastVerified">Not yet confirmed</div></div>
               </div>
               <div class="flex justify-between mt-4">
-                <button class="text-sm border border-gray-700 px-4 py-2 rounded-lg">OPEN FULL PASSPORT →</button>
-                <button class="text-sm border border-gray-700 px-4 py-2 rounded-lg">PRINT QR LABEL →</button>
+                <button id="fullPassport" class="text-sm border border-gray-700 px-4 py-2 rounded-lg">OPEN FULL PASSPORT →</button>
+                <button id="printFromPassport" class="text-sm border border-gray-700 px-4 py-2 rounded-lg">PRINT QR LABEL →</button>
               </div>
             </div>
           </div>
         </div>
+
         <div class="card p-5">
           <div class="flex justify-between items-center mb-4">
-            <div><div class="font-semibold">Recent service activity</div><div class="text-xs text-gray-500">A SINGLE TIMELINE, MULTIPLE EVIDENCE STATES</div></div>
-            <button class="text-xs border border-gray-700 px-3 py-1 rounded">VIEW ALL</button>
+            <div><div class="font-semibold">Recent service activity</div><div class="text-xs text-gray-500">SINGLE TIMELINE</div></div>
+            <button id="viewAllTimeline" class="text-xs border border-gray-700 px-3 py-1 rounded">VIEW ALL</button>
           </div>
           <div class="space-y-4" id="timelineList"></div>
         </div>
       </div>
-      <div id="view-passports" class="hidden"><h2 class="text-2xl font-bold mb-4">Equipment Passports</h2><p class="text-gray-400">Asset registry with QR labels, nameplate data, and configuration tracking.</p></div>
-      <div id="view-diagnostics" class="hidden"><h2 class="text-2xl font-bold mb-4">Diagnostics</h2><p class="text-gray-400">Symptom → cause → action paths with safety gates.</p></div>
-      <div id="view-timeline" class="hidden"><h2 class="text-2xl font-bold mb-4">Service Timeline</h2><div id="fullTimeline" class="space-y-4"></div></div>
-      <div id="view-library" class="hidden"><h2 class="text-2xl font-bold mb-4">Technical Source Library</h2><div class="space-y-3" id="libraryList"></div></div>
-      <div id="view-simulator" class="hidden"><h2 class="text-2xl font-bold mb-4">Flow Simulator</h2><canvas id="sim" width="800" height="300" class="w-full bg-black rounded border border-gray-800"></canvas></div>
+
+      <div id="view-passports" class="hidden">
+        <h2 class="text-2xl font-bold mb-4">Equipment Passports</h2>
+        <div class="card p-5">
+          <div class="font-semibold mb-2">Kitchen Exhaust Line A</div>
+          <div class="text-sm text-gray-400">KEF-ATX-001 · ESP + mechanical · Austin, TX</div>
+          <button id="printFromPassports" class="mt-3 text-sm border border-gray-700 px-4 py-2 rounded-lg">PRINT QR LABEL</button>
+        </div>
+      </div>
+
+      <div id="view-diagnostics" class="hidden">
+        <h2 class="text-2xl font-bold mb-4">Diagnostics</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="card p-4">
+            <div class="font-semibold mb-3">Select symptom</div>
+            <div class="space-y-2" id="symptomList"></div>
+          </div>
+          <div class="card p-4 min-h-[200px]" id="diagResult">Select a symptom.</div>
+        </div>
+      </div>
+
+      <div id="view-timeline" class="hidden">
+        <h2 class="text-2xl font-bold mb-4">Service Timeline</h2>
+        <div id="fullTimeline" class="space-y-4"></div>
+      </div>
+
+      <div id="view-library" class="hidden">
+        <h2 class="text-2xl font-bold mb-4">Technical Source Library</h2>
+        <div class="space-y-3" id="libraryList"></div>
+        <p class="text-xs text-gray-500 mt-4">References are starting points. Confirm exact model, revision, listing, and site requirements before work.</p>
+      </div>
+
+      <div id="view-simulator" class="hidden">
+        <h2 class="text-2xl font-bold mb-4">Flow Simulator</h2>
+        <div class="flex gap-2 mb-3">
+          <button id="simStart" class="px-4 py-2 bg-[#00ff87] text-black font-bold rounded text-sm">RUN FLOW</button>
+          <button id="simLoad" class="px-4 py-2 border border-[#ffcc00] text-[#ffcc00] rounded text-sm">LOAD FILTERS</button>
+          <button id="simWash" class="px-4 py-2 border border-[#60efff] text-[#60efff] rounded text-sm">WASH</button>
+          <div class="ml-auto text-xs font-mono"><span class="text-[#ffcc00]">PRESSURE: </span><span id="pressure">0.40</span> in. w.c. <span class="ml-3 text-[#ff0080]">CAPTURE: </span><span id="capture">94</span>%</div>
+        </div>
+        <canvas id="sim" width="900" height="320" class="w-full bg-black rounded border border-gray-800"></canvas>
+      </div>
+
+      <div id="printLabel" class="hidden fixed inset-0 bg-white text-black p-8">
+        <div class="text-center">
+          <div class="text-2xl font-bold mb-2">MY KEF ASSET LABEL</div>
+          <div id="qrPrint" class="inline-block mb-4"></div>
+          <div class="text-lg font-mono">KEF-ATX-001</div>
+          <div>Kitchen Exhaust Line A</div>
+          <div class="text-sm mt-2">Scan for service history</div>
+        </div>
+      </div>
     </div>
   </main>
+
+  <div id="logModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-[#111] border border-gray-700 rounded-xl p-6 w-full max-w-md">
+      <div class="font-semibold mb-4">Log service event</div>
+      <input id="logAsset" value="KEF-ATX-001" class="w-full mb-2 bg-black border border-gray-700 rounded px-3 py-2 text-sm" placeholder="Asset ID">
+      <input id="logTech" class="w-full mb-2 bg-black border border-gray-700 rounded px-3 py-2 text-sm" placeholder="Tech name">
+      <select id="logAction" class="w-full mb-2 bg-black border border-gray-700 rounded px-3 py-2 text-sm">
+        <option>Cleaning and visual inspection</option>
+        <option>ESP cell wash / inspect</option>
+        <option>Filter replacement</option>
+        <option>Pressure check / alarm</option>
+        <option>Diagnostic</option>
+        <option>Other</option>
+      </select>
+      <select id="logStatus" class="w-full mb-2 bg-black border border-gray-700 rounded px-3 py-2 text-sm">
+        <option value="OBSERVED">OBSERVED</option>
+        <option value="DIAGNOSED">DIAGNOSED</option>
+        <option value="UNRESOLVED">UNRESOLVED</option>
+        <option value="VERIFIED">VERIFIED</option>
+      </select>
+      <textarea id="logNotes" class="w-full mb-4 bg-black border border-gray-700 rounded px-3 py-2 text-sm h-24" placeholder="Notes, readings, conditions..."></textarea>
+      <div class="flex justify-end gap-2">
+        <button id="cancelLog" class="px-4 py-2 border border-gray-700 rounded text-sm">Cancel</button>
+        <button id="saveLog" class="px-4 py-2 bg-[#00ff87] text-black font-bold rounded text-sm">Save event</button>
+      </div>
+    </div>
+  </div>
 </body>
 <script>
-const events = [
-  { date: '2026-10-18', title: 'Cleaning and visual inspection logged', detail: 'Kitchen Exhaust Line A · Service visit · Demo cleaner\nGrease residue documented near fan reservoir; two timestamped photos referenced in the demo.', status: 'OBSERVED', color: 'green' },
-  { date: '2026-10-17', title: 'Control display fault noted', detail: 'Kitchen Exhaust Line A · Fault report · Demo technician\nDisplay showed an example alert. Exact controller/model and code not captured.', status: 'UNRESOLVED', color: 'yellow' },
-  { date: '2026-10-14', title: 'ESP collection area condition recorded', detail: 'Dining Room PCU · Inspection · Demo technician\nExample note reports visible deposits on a collection-stage surface after shutdown.', status: 'DIAGNOSED', color: 'blue' },
-  { date: '2026-10-12', title: 'Nameplate identification missing', detail: 'Roof Exhaust Fan 1 · Data quality · Demo cleaner\nMake, model and serial not captured in demo record.', status: 'UNRESOLVED', color: 'yellow' }
-];
-const findings = [
-  { id: 'F-301', asset: 'KEF-ATX-001', title: 'Example controller alert', detail: 'Alert reported; exact controller and code missing.', status: 'UNRESOLVED' },
-  { id: 'F-302', asset: 'KEF-ATX-001', title: 'Grease residue near fan reservoir', detail: 'Visible residue described in demo event; photo not embedded.', status: 'OPEN' },
-  { id: 'F-303', asset: 'PCU-ATX-002', title: 'ESP stage condition review', detail: 'Deposits reported; equipment isolated state not recorded.', status: 'AWAITING REVIEW' }
-];
+let events = JSON.parse(localStorage.getItem('mykef-events') || '[]');
+const diags = {
+  smoke: { title: 'Visible smoke at discharge', causes: ['ESP cells dirty or plates shorted', 'Media filters saturated', 'Pre-filters missing or clogged', 'Bypass around filters'], actions: ['Inspect and clean/replace ESP cells or media', 'Verify all doors and seals', 'Check pressure differential'] },
+  odor: { title: 'Odor breakthrough', causes: ['Carbon trays saturated', 'Upstream particle stage not capturing'], actions: ['Replace carbon trays', 'Verify upstream stage'] },
+  zap: { title: 'ESP flickering / constant zap', causes: ['Dirty cells', 'Bent collector plates', 'Loose ionizer wires', 'Debris between plates'], actions: ['Power down, lock out, clean cells', 'Straighten plates, reseat wires', 'Dry completely'] },
+  off: { title: 'ESP light completely off', causes: ['Door interlock not made', 'Wash cycle active', 'Power pack failed', 'Cells hard shorted'], actions: ['Confirm door fully closed', 'Wait for wash or cancel', 'Check breaker and power pack'] },
+  overload: { title: 'Fan overload / high static', causes: ['Clogged filters or cells', 'Filters missing', 'Fan speed too high'], actions: ['Clean or replace filters/cells', 'Verify all filters installed'] },
+  alarm: { title: 'Filter / dirty alarm', causes: ['Actual filter loading', 'Pressure switch set too low', 'Tubing clogged'], actions: ['Service the filters', 'Verify switch setpoint'] }
+};
 const library = [
-  { title: 'CaptiveAire PCU O&M Manual', note: 'OEM operation & maintenance · Model and revision must match the installed PCU.' },
-  { title: 'Gaylord ClearAir ESP OW Technical Manual', note: 'OEM technical manual · ESP-specific guidance; follow the exact equipment procedure.' },
-  { title: 'Gaylord TPF with FM-100 Technical Manual', note: 'OEM technical manual · Check configuration and document revision.' }
+  { title: 'CaptiveAire PCU O&M Manual', note: 'OEM operation & maintenance. Model and revision must match the installed PCU.' },
+  { title: 'Gaylord ClearAir ESP Technical Manual', note: 'ESP-specific guidance. Follow the exact equipment procedure.' }
 ];
-function statusBadge(s, c) {
-  const colors = { green: 'bg-green-900/40 text-green-400 border-green-800', yellow: 'bg-yellow-900/40 text-yellow-400 border-yellow-800', blue: 'bg-blue-900/40 text-blue-400 border-blue-800', pink: 'bg-pink-900/40 text-pink-400 border-pink-800' };
-  return `<span class="badge border ${colors[c] || colors.yellow}">${s}</span>`;
+
+function statusBadge(s) {
+  const map = { OBSERVED: 'bg-green-900/40 text-green-400 border-green-800', DIAGNOSED: 'bg-blue-900/40 text-blue-400 border-blue-800', UNRESOLVED: 'bg-yellow-900/40 text-yellow-400 border-yellow-800', VERIFIED: 'bg-green-900/40 text-green-400 border-green-800' };
+  return `<span class="badge border ${map[s] || map.UNRESOLVED}">${s}</span>`;
 }
-function renderTimeline(target) {
-  target.innerHTML = events.map(e => `
+
+function renderTimeline(target, limit) {
+  const list = limit ? events.slice(-limit).reverse() : events.slice().reverse();
+  target.innerHTML = list.length ? list.map(e => `
     <div class="flex gap-3 border-b border-gray-800 pb-4">
       <div class="w-8 h-8 border border-gray-700 rounded flex items-center justify-center text-xs shrink-0">▣</div>
       <div class="flex-1">
-        <div class="flex justify-between"><div class="font-medium">${e.title}</div><div class="text-xs text-gray-500">${e.date}</div></div>
-        <div class="text-sm text-gray-400 whitespace-pre-line mt-1">${e.detail}</div>
-        <div class="mt-2">${statusBadge(e.status, e.color)}</div>
+        <div class="flex justify-between"><div class="font-medium">${e.action}</div><div class="text-xs text-gray-500">${e.date}</div></div>
+        <div class="text-sm text-gray-400 mt-1">${e.asset} · ${e.tech}</div>
+        ${e.notes ? `<div class="text-sm text-gray-400 mt-1">${e.notes}</div>` : ''}
+        <div class="mt-2">${statusBadge(e.status)}</div>
       </div>
     </div>
-  `).join('');
+  `).join('') : '<p class="text-gray-500 text-sm">No events logged.</p>';
 }
-function renderLibrary() {
-  document.getElementById('libraryList').innerHTML = library.map(l => `
-    <div class="card p-4 flex gap-3">
-      <div class="text-green-400">↗</div>
-      <div><div class="font-medium">${l.title}</div><div class="text-xs text-gray-500">${l.note}</div></div>
-    </div>
-  `).join('') + `<p class="text-xs text-gray-500 mt-4">References are starting points, not universal instructions. Confirm exact model, revision, listing, jurisdiction, and site requirements before work.</p>`;
+
+function updateCounts() {
+  document.getElementById('eventCount').textContent = events.length;
+  const unresolved = events.filter(e => e.status === 'UNRESOLVED').length;
+  document.getElementById('unresolvedCount').textContent = unresolved;
+  document.getElementById('findingCount').textContent = unresolved;
+  document.getElementById('openFindingBadge').textContent = unresolved + ' OPEN FINDINGS';
+  if (events.length) document.getElementById('lastVisit').textContent = 'Last visit: ' + events[events.length-1].date.split(',')[0];
 }
-renderTimeline(document.getElementById('timelineList'));
-renderTimeline(document.getElementById('fullTimeline'));
-renderLibrary();
+
+function saveEvents() {
+  localStorage.setItem('mykef-events', JSON.stringify(events));
+  updateCounts();
+  renderTimeline(document.getElementById('timelineList'), 5);
+  renderTimeline(document.getElementById('fullTimeline'));
+}
+
+function openLog() { document.getElementById('logModal').classList.remove('hidden'); }
+function closeLog() { document.getElementById('logModal').classList.add('hidden'); }
+
+document.getElementById('logEventBtn').onclick = openLog;
+document.getElementById('quickLog').onclick = openLog;
+document.getElementById('cancelLog').onclick = closeLog;
+document.getElementById('saveLog').onclick = () => {
+  const entry = {
+    asset: document.getElementById('logAsset').value || 'KEF-ATX-001',
+    tech: document.getElementById('logTech').value || 'Unknown',
+    action: document.getElementById('logAction').value,
+    status: document.getElementById('logStatus').value,
+    notes: document.getElementById('logNotes').value,
+    date: new Date().toLocaleString()
+  };
+  events.push(entry);
+  saveEvents();
+  document.getElementById('logNotes').value = '';
+  closeLog();
+};
+
+function showPrint() {
+  document.getElementById('printLabel').classList.remove('hidden');
+  const box = document.getElementById('qrPrint');
+  box.innerHTML = '';
+  new QRCode(box, { text: 'MyKEF:KEF-ATX-001', width: 180, height: 180, colorDark: '#000', colorLight: '#fff' });
+  setTimeout(() => window.print(), 300);
+}
+document.getElementById('printLabelBtn').onclick = showPrint;
+document.getElementById('printFromPassport').onclick = showPrint;
+document.getElementById('printFromPassports').onclick = showPrint;
+
+document.getElementById('exportBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify(events, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mykef-events.json';
+  a.click();
+};
+
+document.getElementById('viewAllTimeline').onclick = () => {
+  document.querySelector('[data-view="timeline"]').click();
+};
+
+document.getElementById('symptomList').innerHTML = Object.keys(diags).map(k => `<button data-sym="${k}" class="sym-btn w-full text-left px-3 py-2 rounded border border-gray-700 text-sm hover:border-[#ff0080]">${diags[k].title}</button>`).join('');
+document.querySelectorAll('.sym-btn').forEach(btn => {
+  btn.onclick = () => {
+    const d = diags[btn.dataset.sym];
+    document.getElementById('diagResult').innerHTML = `<div class="font-semibold text-[#00ff87] mb-2">${d.title}</div><div class="text-xs mb-2"><span class="text-[#ff0080]">Causes:</span><ul class="list-disc ml-4">${d.causes.map(c=>`<li>${c}</li>`).join('')}</ul></div><div class="text-xs"><span class="text-[#ffcc00]">Actions:</span><ul class="list-disc ml-4">${d.actions.map(a=>`<li>${a}</li>`).join('')}</ul></div>`;
+  };
+});
+
+document.getElementById('libraryList').innerHTML = library.map(l => `<div class="card p-4 flex gap-3"><div class="text-green-400">↗</div><div><div class="font-medium">${l.title}</div><div class="text-xs text-gray-500">${l.note}</div></div></div>`).join('');
+
 document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -178,21 +322,49 @@ document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
     document.getElementById('viewLabel').textContent = btn.textContent.trim().toUpperCase();
   });
 });
-document.getElementById('logEventBtn').addEventListener('click', () => alert('Log Service Event form would open here. In production this writes to the shared asset timeline with evidence states.'));
-document.getElementById('quickLog').addEventListener('click', () => alert('Quick log: select asset, type, notes, photos. Creates OBSERVED or UNRESOLVED event.'));
+
 const canvas = document.getElementById('sim');
-if (canvas) {
-  const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d');
+let particles = [], running = false, loadLevel = 0;
+function drawSim() {
   ctx.fillStyle = '#0a0a0f';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle = '#00ff87';
-  ctx.strokeRect(40, 60, 160, 180);
-  ctx.strokeRect(220, 60, 200, 180);
-  ctx.strokeRect(440, 60, 140, 180);
-  ctx.fillStyle = '#60efff';
-  for (let i = 0; i < 5; i++) ctx.fillRect(240 + i*32, 80, 2, 140);
-  ctx.fillStyle = '#ffcc00';
-  for (let i = 0; i < 12; i++) ctx.fillRect(60 + Math.random()*120, 80 + Math.random()*140, 3, 3);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const zones = [{x:0,w:140},{x:140,w:160},{x:300,w:240},{x:540,w:180},{x:720,w:180}];
+  zones.forEach((z,i) => {
+    ctx.fillStyle = ['#222','#132','#123','#211','#222'][i] + '80';
+    ctx.fillRect(z.x, 30, z.w, 260);
+    ctx.strokeStyle = '#00ff87';
+    ctx.strokeRect(z.x, 30, z.w, 260);
+  });
+  for (let i = 0; i < 7; i++) {
+    ctx.strokeStyle = loadLevel > 40 ? '#ff0080' : '#60efff';
+    ctx.beginPath(); ctx.moveTo(320 + i*30, 50); ctx.lineTo(320 + i*30, 270); ctx.stroke();
+  }
+  ctx.fillStyle = '#00ff87';
+  ctx.fillRect(160, 40, loadLevel * 1.4, 6);
 }
+function tick() {
+  if (!running) return;
+  drawSim();
+  if (Math.random() < 0.35) particles.push({ x: 10, y: 50 + Math.random()*220, vx: 1.8 + Math.random(), vy: (Math.random()-0.5)*0.3, size: 2, captured: false, color: Math.random()>0.4?'#ffcc00':'#ff0080' });
+  particles.forEach((p,i) => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x > 310 && p.x < 530 && !p.captured && Math.random() < 0.07 * (1 - loadLevel/120)) { p.captured = true; p.color = '#00ff87'; p.vx *= 0.4; }
+    if (p.captured) p.vx *= 0.96;
+    ctx.fillStyle = p.color; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
+    if (p.x > 900) particles.splice(i,1);
+  });
+  const pressure = (0.4 + loadLevel * 0.01).toFixed(2);
+  const capture = Math.max(62, 95 - loadLevel * 0.22);
+  document.getElementById('pressure').textContent = pressure;
+  document.getElementById('capture').textContent = Math.round(capture);
+  requestAnimationFrame(tick);
+}
+document.getElementById('simStart').onclick = () => { running = true; particles = []; tick(); };
+document.getElementById('simLoad').onclick = () => { loadLevel = Math.min(100, loadLevel + 12); };
+document.getElementById('simWash').onclick = () => { loadLevel = Math.max(0, loadLevel - 35); };
+drawSim();
+
+saveEvents();
 </script>
 </html>
